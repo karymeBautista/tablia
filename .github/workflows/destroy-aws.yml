@@ -16,7 +16,6 @@ jobs:
   destroy:
     if: ${{ inputs.confirmation == 'DESTROY' && vars.AWS_ROLE_ARN != '' }}
     runs-on: ubuntu-latest
-    environment: production
     env:
       AWS_REGION: us-east-1
     steps:

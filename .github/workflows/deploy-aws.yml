@@ -2,8 +2,6 @@ name: Deploy AWS
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
@@ -17,7 +15,6 @@ jobs:
   deploy:
     if: ${{ vars.AWS_ROLE_ARN != '' }}
     runs-on: ubuntu-latest
-    environment: production
     env:
       AWS_REGION: us-east-1
     steps:
