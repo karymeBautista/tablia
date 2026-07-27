@@ -1,0 +1,32 @@
+{
+  "name": "tablia",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "infra"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @tablia/api\" \"npm run dev -w @tablia/web\"",
+    "dev:api": "npm run dev -w @tablia/api",
+    "dev:web": "npm run dev -w @tablia/web",
+    "db:setup": "npm run db:setup -w @tablia/api",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration -w @tablia/api",
+    "build": "npm run build -w @tablia/web && npm run build -w @tablia/api",
+    "synth": "npm run synth -w @tablia/infra",
+    "deploy:aws": "npm run build && npm run deploy -w @tablia/infra -- --require-approval never",
+    "destroy:aws": "npm run destroy -w @tablia/infra -- --force",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build && npm run synth"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

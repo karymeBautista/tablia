@@ -1,0 +1,92 @@
+{
+  "info": {
+    "_postman_id": "84a5d2de-fd65-4e87-b2a8-tablia000001",
+    "name": "Tablia API",
+    "description": "CRUD de personas. Ejecutar en orden y sustituir apiBaseUrl por la URL de API Gateway al desplegar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{apiBaseUrl}}/api/health" }
+    },
+    {
+      "name": "Crear persona",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Creada con 201', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.environment.set('personaId', body.data.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Karyme Bautista\",\n  \"rfc\": \"BAUK950515A12\",\n  \"correoElectronico\": \"karyme@example.com\",\n  \"codigoPostal\": \"86000\"\n}"
+        },
+        "url": "{{apiBaseUrl}}/api/personas"
+      }
+    },
+    {
+      "name": "Listar personas",
+      "request": {
+        "method": "GET",
+        "url": "{{apiBaseUrl}}/api/personas?page=1&limit=10&search="
+      }
+    },
+    {
+      "name": "Consultar persona",
+      "request": {
+        "method": "GET",
+        "url": "{{apiBaseUrl}}/api/personas/{{personaId}}"
+      }
+    },
+    {
+      "name": "Actualizar persona completa",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"Karyme Bautista Hernández\",\n  \"rfc\": \"BAUK950515A12\",\n  \"correoElectronico\": \"karyme@example.com\",\n  \"codigoPostal\": \"86010\"\n}"
+        },
+        "url": "{{apiBaseUrl}}/api/personas/{{personaId}}"
+      }
+    },
+    {
+      "name": "Actualizar código postal",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"codigoPostal\": \"01234\"\n}" },
+        "url": "{{apiBaseUrl}}/api/personas/{{personaId}}"
+      }
+    },
+    {
+      "name": "Validación: datos inválidos",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombreCompleto\": \"\",\n  \"rfc\": \"INVALIDO\",\n  \"correoElectronico\": \"correo-invalido\",\n  \"codigoPostal\": \"123\"\n}"
+        },
+        "url": "{{apiBaseUrl}}/api/personas"
+      }
+    },
+    {
+      "name": "Eliminar persona",
+      "request": {
+        "method": "DELETE",
+        "url": "{{apiBaseUrl}}/api/personas/{{personaId}}"
+      }
+    }
+  ]
+}

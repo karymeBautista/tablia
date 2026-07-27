@@ -1,0 +1,34 @@
+name: Destroy AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Escribe DESTROY para eliminar los recursos de Tablia
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  destroy:
+    if: ${{ inputs.confirmation == 'DESTROY' && vars.AWS_ROLE_ARN != '' }}
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      AWS_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Eliminar TabliaStack
+        run: npm run destroy -w @tablia/infra -- --force

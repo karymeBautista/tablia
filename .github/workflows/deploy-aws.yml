@@ -1,0 +1,57 @@
+name: Deploy AWS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: tablia-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ vars.AWS_ROLE_ARN != '' }}
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      AWS_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Autenticar en AWS sin llaves permanentes
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Obtener cuenta AWS
+        shell: bash
+        run: echo "CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)" >> "$GITHUB_ENV"
+      - name: Preparar CDK en la cuenta
+        run: npx cdk bootstrap "aws://${CDK_DEFAULT_ACCOUNT}/${AWS_REGION}"
+      - name: Desplegar infraestructura y aplicación
+        run: npm run deploy -w @tablia/infra -- --require-approval never
+      - name: Publicar URLs y comprobar salud
+        shell: bash
+        run: |
+          WEB_URL=$(aws cloudformation describe-stacks --stack-name TabliaStack --query "Stacks[0].Outputs[?OutputKey=='WebUrl'].OutputValue" --output text)
+          API_URL=$(aws cloudformation describe-stacks --stack-name TabliaStack --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" --output text)
+          {
+            echo "## Tablia desplegado"
+            echo ""
+            echo "- Web: ${WEB_URL}"
+            echo "- API para Postman: ${API_URL}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          curl --fail --retry 10 --retry-delay 10 "${API_URL}api/health"
