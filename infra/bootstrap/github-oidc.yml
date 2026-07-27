@@ -5,9 +5,15 @@ Parameters:
   GitHubOrganization:
     Type: String
     Default: karymeBautista
+  GitHubOrganizationId:
+    Type: String
+    Default: "74372462"
   GitHubRepository:
     Type: String
     Default: tablia
+  GitHubRepositoryId:
+    Type: String
+    Default: "1313220089"
   GitHubBranch:
     Type: String
     Default: main
@@ -41,8 +47,8 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringLike:
                 token.actions.githubusercontent.com:sub:
-                  - !Sub repo:${GitHubOrganization}/${GitHubRepository}:ref:refs/heads/${GitHubBranch}
-                  - !Sub repo:${GitHubOrganization}/${GitHubRepository}:environment:${GitHubEnvironment}
+                  - !Sub repo:${GitHubOrganization}@${GitHubOrganizationId}/${GitHubRepository}@${GitHubRepositoryId}:ref:refs/heads/${GitHubBranch}
+                  - !Sub repo:${GitHubOrganization}@${GitHubOrganizationId}/${GitHubRepository}@${GitHubRepositoryId}:environment:${GitHubEnvironment}
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/PowerUserAccess
       Policies:
