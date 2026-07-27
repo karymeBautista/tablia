@@ -1,0 +1,34 @@
+name: Diagnose GitHub OIDC
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  claims:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mostrar identidad pública del token
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const token = await core.getIDToken("sts.amazonaws.com");
+            const payload = JSON.parse(
+              Buffer.from(token.split(".")[1], "base64url").toString("utf8")
+            );
+
+            for (const claim of [
+              "iss",
+              "aud",
+              "sub",
+              "repository",
+              "repository_id",
+              "repository_owner",
+              "repository_owner_id",
+              "ref"
+            ]) {
+              core.info(`${claim}: ${payload[claim]}`);
+            }
