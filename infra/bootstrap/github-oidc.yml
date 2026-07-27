@@ -11,6 +11,9 @@ Parameters:
   GitHubBranch:
     Type: String
     Default: main
+  GitHubEnvironment:
+    Type: String
+    Default: production
 
 Resources:
   GitHubOidcProvider:
@@ -37,7 +40,9 @@ Resources:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringLike:
-                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrganization}/${GitHubRepository}:ref:refs/heads/${GitHubBranch}
+                token.actions.githubusercontent.com:sub:
+                  - !Sub repo:${GitHubOrganization}/${GitHubRepository}:ref:refs/heads/${GitHubBranch}
+                  - !Sub repo:${GitHubOrganization}/${GitHubRepository}:environment:${GitHubEnvironment}
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/PowerUserAccess
       Policies:
