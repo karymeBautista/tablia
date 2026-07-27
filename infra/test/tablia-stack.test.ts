@@ -17,8 +17,7 @@ describe("TabliaStack", () => {
       Engine: "mysql"
     });
     template.hasResourceProperties("AWS::Lambda::Function", {
-      Runtime: "nodejs22.x",
-      ReservedConcurrentExecutions: 5
+      Runtime: "nodejs22.x"
     });
   });
 

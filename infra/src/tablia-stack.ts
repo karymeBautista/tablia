@@ -113,7 +113,6 @@ export class TabliaStack extends Stack {
       handler: "handler",
       memorySize: 512,
       timeout: Duration.seconds(20),
-      reservedConcurrentExecutions: 5,
       tracing: lambda.Tracing.ACTIVE,
       logGroup: apiLogGroup
     });
